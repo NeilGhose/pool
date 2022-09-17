@@ -27,10 +27,15 @@ class Ball:
         self.velx *= 0.99
         self.vely *= 0.99
         
-        if self.posx < 900/352 or self.posx > 200-900/352:
-            self.velx = -self.velx
-        if self.posy < 900/352 or self.posy > 100-900/352:
-            self.vely = -self.vely
+        if self.posx < 900/352:
+            self.velx = abs(self.velx)
+        elif self.posx > 200-900/352:
+            self.velx = -abs(self.velx)
+        
+        if self.posy < 900/352:
+            self.vely = abs(self.vely)
+        elif self.posy > 100-900/352:
+            self.vely = -abs(self.vely)
             
         if self.velx**2 + self.vely**2 <0.005:
             self.velx = 0
@@ -38,6 +43,11 @@ class Ball:
 
     def draw(self):
         pg.draw.circle(win, (255,255,255), tableToAbsolute(table_size, y_buffer, self.posx, self.posy), ball_size)
+    
+    def hit(self, m_pos):
+        b_x, b_y = tableToAbsolute(table_size, y_buffer, self.posx, self.posy)
+        self.velx = (b_x - m_pos[0]) / 500
+        self.vely = (b_y - m_pos[1]) / 500
                 
 def tableToAbsolute(size, y_buffer, x, y):
     x = 100+x*size[0]/200
@@ -55,7 +65,7 @@ def redraw():
             
 
 ball = Ball((50,50))
-ball.velx, ball.vely = 2, 3
+ball.velx, ball.vely = 2, 2
 while run:
     pg.time.delay(10)
     ball.move()
@@ -75,6 +85,9 @@ while run:
             
     if k[pg.K_ESCAPE]:
         run=False
+    
+    if pg.mouse.get_pressed()[0]:
+        ball.hit(pg.mouse.get_pos())
 
     pg.display.update()
 
